@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+
+# Virtual environment
+venv/
+.env/
+
+# Logs
+logs/
+
+# Vector index & database files
+data/vector_index/
+data/metadata_backup/
+database/*.db
+
+# OS files
+.DS_Store
+Thumbs.db
