@@ -20,3 +20,6 @@ database/*.db
 # OS files
 .DS_Store
 Thumbs.db
+
+#original files
+docs/pdf_raw/
