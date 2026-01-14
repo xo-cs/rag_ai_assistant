@@ -1,0 +1,8 @@
+# Core
+python-dotenv
+
+# PDF processing
+pymupdf
+
+# Utilities
+tqdm

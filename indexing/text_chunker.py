@@ -49,7 +49,7 @@ def chunk_documents(documents, min_chunk_length: int = 100):
 
 
 
-if name == "__main__":
+if __name__ == "__main__":
     docs = load_documents(DATA_DIR)
     chunks = chunk_documents(docs)
 
