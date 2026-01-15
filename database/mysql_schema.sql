@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS rag_metadata;
+CREATE DATABASE rag_metadata;
 USE rag_metadata;
 
 CREATE TABLE IF NOT EXISTS document_chunks (
