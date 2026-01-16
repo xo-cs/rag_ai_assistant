@@ -20,7 +20,7 @@ class EmbeddingService:
         Embed document chunks for indexing.
         chunks: List[dict] with key 'text'
         """
-        texts = [c["text"] for c in chunks]
+        texts = [c["chunk_text"] for c in chunks]
 
         embeddings = self.model.encode(
             texts,
