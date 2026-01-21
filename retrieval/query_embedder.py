@@ -10,7 +10,6 @@ class QueryEmbedder:
     def embed(self, query: str) -> np.ndarray:
         """
         Convert user query into vector.
-        Output shape: (1, dim)
         """
         vec = self.embedder.embed_query(query)
         return np.array([vec]).astype("float32")

@@ -7,8 +7,8 @@ from indexing.document_loader import load_documents, DATA_DIR
 
 def chunk_text(
     text: str,
-    chunk_size: int = 500,
-    overlap: int = 100
+    chunk_size: int = 600,
+    overlap: int = 200
 ):
     """
     Splits text into overlapping chunks.
@@ -38,7 +38,10 @@ def chunk_documents(documents, min_chunk_length: int = 100):
     for doc in documents:
         chunks = chunk_text(doc["text"])
         doc_name = doc.get("document_name", Path(doc["source"]).name)
-        page_num = doc.get("page_number")  # Exact page number from PDF
+        
+        # --- FIX IS HERE ---
+        # We use "page_num" because that is what document_loader.py saves.
+        page_num = doc.get("page_num")  
         
         for i, chunk in enumerate(chunks):
             chunk = chunk.strip()
@@ -46,9 +49,10 @@ def chunk_documents(documents, min_chunk_length: int = 100):
                 continue
 
             # Create unique chunk ID
+            # If page_num is None, it will show 'pageNone', otherwise 'page1', 'page2' etc.
             chunk_id = f"{doc_name}_page{page_num}_chunk{i}_{uuid.uuid4().hex[:6]}"
             
-            # Use exact page number
+            # Use exact page number for the metadata section
             if page_num:
                 page_section = f"Page {page_num}"
             else:
@@ -86,6 +90,7 @@ def prepare_for_database(chunks):
 
 
 if __name__ == "__main__":
+    # Test run
     docs = load_documents(DATA_DIR)
     chunks = chunk_documents(docs)
 
