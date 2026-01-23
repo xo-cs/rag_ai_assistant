@@ -1,32 +1,39 @@
-# indexing/embedding_service.py
+# indexing/embedding_device.py
 
 from sentence_transformers import SentenceTransformer
 import numpy as np
+import torch
 
 class EmbeddingService:
     """
     Vector Embedding Service
-    Uses BAAI/bge-m3 for multilingual dense retrieval
+    Forced to CPU for stability on M1 Air (8GB).
     """
 
     def __init__(self, model_name: str = "BAAI/bge-m3"):
+        # FORCE CPU: MPS (GPU) causes swapping/freezing on 8GB RAM for large batches
+        self.device = "cpu"
+        print(f"💻 Using CPU for {model_name} (Stable Mode)")
+
         self.model = SentenceTransformer(
             model_name,
-            trust_remote_code=True  # required for bge-m3
+            trust_remote_code=True,
+            device=self.device
         )
 
     def embed_chunks(self, chunks):
         """
         Embed document chunks for indexing.
-        chunks: List[dict] with key 'text'
         """
         texts = [c["chunk_text"] for c in chunks]
 
+        # CPU handles smaller batches better
         embeddings = self.model.encode(
             texts,
-            batch_size=16,
+            batch_size=16, 
             show_progress_bar=True,
-            normalize_embeddings=True
+            normalize_embeddings=True,
+            device=self.device
         )
 
         return np.array(embeddings)
@@ -37,7 +44,8 @@ class EmbeddingService:
         """
         embedding = self.model.encode(
             query,
-            normalize_embeddings=True
+            normalize_embeddings=True,
+            device=self.device
         )
-
+        
         return embedding

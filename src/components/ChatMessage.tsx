@@ -1,54 +1,54 @@
-import { User, Bot } from 'lucide-react';
-import type { ChatMessage as ChatMessageType } from '../types';
+import React from 'react';
+import { User, Bot, BookOpen, Clock } from 'lucide-react';
+import { Message } from '../types';
 
 interface ChatMessageProps {
-  message: ChatMessageType;
+  message: Message;
 }
 
-export default function ChatMessage({ message }: ChatMessageProps) {
+const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.role === 'user';
 
   return (
-    <div className={`flex gap-4 ${isUser ? 'flex-row-reverse' : ''}`}>
-      <div
-        className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-          isUser ? 'bg-surface-light' : 'bg-surface-light'
-        }`}
-      >
-        {isUser ? (
-          <User size={16} className="text-text-secondary" />
-        ) : (
-          <Bot size={16} className="text-text-secondary" />
-        )}
-      </div>
-
-      <div
-        className={`flex-1 max-w-[80%] ${isUser ? 'text-right' : 'text-left'}`}
-      >
-        <div
-          className={`inline-block px-4 py-3 rounded-xl ${
-            isUser
-              ? 'bg-surface-light text-text-primary'
-              : 'bg-surface border border-border text-text-primary'
-          }`}
-        >
-          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+      <div className={`max-w-[85%] rounded-2xl p-5 ${
+        isUser 
+          ? 'bg-black text-white' 
+          : 'bg-gray-50 text-gray-900 border border-gray-100'
+      }`}>
+        <div className="flex items-center justify-between mb-3 opacity-60 text-xs font-medium uppercase tracking-wider">
+          <div className="flex items-center space-x-2">
+            {isUser ? <User size={14} /> : <Bot size={14} />}
+            <span>{message.role}</span>
+          </div>
+          
+          {!isUser && message.generation_time && (
+            <div className="flex items-center space-x-1 text-emerald-600">
+              <Clock size={12} />
+              <span>{message.generation_time}s</span>
+            </div>
+          )}
         </div>
-
+        
+        <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
+        
         {message.sources && message.sources.length > 0 && (
-          <div className="mt-2 space-y-1">
-            <p className="text-xs text-text-muted">Sources:</p>
-            {message.sources.map((source, idx) => (
-              <div
-                key={idx}
-                className="inline-block px-2 py-1 bg-surface rounded text-xs text-text-secondary"
-              >
-                {source.filename}
-              </div>
-            ))}
+          <div className="mt-4 pt-3 border-t border-gray-200/50">
+            <p className="text-xs font-semibold opacity-50 mb-2 flex items-center">
+              <BookOpen size={12} className="mr-1" /> Sources
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {message.sources.map((src, i) => (
+                <span key={i} className="text-xs bg-white px-2 py-1 rounded border border-gray-200 text-gray-600 shadow-sm">
+                  {src.document} <span className="opacity-50">({src.page_or_section})</span>
+                </span>
+              ))}
+            </div>
           </div>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default ChatMessage;

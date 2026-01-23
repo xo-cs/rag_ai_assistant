@@ -1,50 +1,73 @@
-import type { Document, SystemStats, SystemInfo, UploadResult, QueryResponse } from '../types';
+import { SystemStatus, UploadResponse, ChatSession, Message } from '../types';
 
-const API_BASE_URL = '/api';
+const API_BASE = 'http://localhost:8000/api';
 
-// TODO: Implement actual API calls when backend is ready
+export const api = {
+  getStatus: async (): Promise<SystemStatus> => {
+    const res = await fetch(`${API_BASE}/status`);
+    return res.json();
+  },
 
-export async function fetchDocuments(): Promise<Document[]> {
-  // TODO: GET /api/documents
-  return [];
-}
+  getDocuments: async (): Promise<any[]> => {
+    const res = await fetch(`${API_BASE}/documents`);
+    return res.json();
+  },
 
-export async function uploadDocument(_file: File): Promise<UploadResult> {
-  // TODO: POST /api/documents
-  void _file;
-  return { success: false, error: 'API not implemented' };
-}
+  deleteDocument: async (filename: string): Promise<void> => {
+    const res = await fetch(`${API_BASE}/documents/${filename}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Delete failed');
+  },
 
-export async function deleteDocument(_id: string): Promise<boolean> {
-  // TODO: DELETE /api/documents/:id
-  void _id;
-  return false;
-}
+  // Chat History
+  getHistory: async (): Promise<ChatSession[]> => {
+    const res = await fetch(`${API_BASE}/history`);
+    return res.json();
+  },
 
-export async function fetchSystemStats(): Promise<SystemStats> {
-  // TODO: GET /api/stats
-  return {
-    documentCount: null,
-    chunkCount: null,
-    vectorIndexStatus: null,
-  };
-}
+  getSessionMessages: async (sessionId: string): Promise<Message[]> => {
+    const res = await fetch(`${API_BASE}/history/${sessionId}`);
+    return res.json();
+  },
 
-export async function fetchSystemInfo(): Promise<SystemInfo> {
-  // TODO: GET /api/system
-  return {
-    llmModel: 'Qwen 3 8B',
-    mode: 'offline',
-  };
-}
+  createSession: async (session: ChatSession): Promise<void> => {
+    await fetch(`${API_BASE}/history`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(session),
+    });
+  },
 
-export async function sendQuery(_query: string): Promise<QueryResponse> {
-  // TODO: POST /api/query
-  void _query;
-  return {
-    answer: '',
-    sources: [],
-  };
-}
+  deleteSession: async (sessionId: string): Promise<void> => {
+    await fetch(`${API_BASE}/history/${sessionId}`, { method: 'DELETE' });
+  },
 
-export { API_BASE_URL };
+  renameSession: async (sessionId: string, title: string): Promise<void> => {
+    await fetch(`${API_BASE}/history/${sessionId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title }),
+    });
+  },
+
+  // Query
+  query: async (query: string, model: string, sessionId: string, targetDocument?: string): Promise<{ answer: string; sources: any[]; generation_time: number }> => {
+    const res = await fetch(`${API_BASE}/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, model, session_id: sessionId, target_document: targetDocument }),
+    });
+    if (!res.ok) throw new Error('Failed to fetch answer');
+    return res.json();
+  },
+
+  upload: async (formData: FormData): Promise<UploadResponse> => {
+    const res = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData });
+    if (!res.ok) throw new Error('Upload failed');
+    return res.json();
+  },
+
+  reindex: async (): Promise<void> => {
+    const res = await fetch(`${API_BASE}/reindex`, { method: 'POST' });
+    if (!res.ok) throw new Error('Indexing failed');
+  }
+};

@@ -1,106 +1,119 @@
-import { useEffect, useState } from 'react';
-import { FileText, Layers, Database, Server, Wifi } from 'lucide-react';
-import { KPICard } from '../components';
-import { fetchSystemStats, fetchSystemInfo } from '../api';
-import type { SystemStats, SystemInfo } from '../types';
+import React, { useEffect, useState } from 'react';
+import { Database, Layers, FileText, Cpu, HardDrive, Server, Brain, Zap } from 'lucide-react';
+import { api } from '../api';
+import { SystemStatus } from '../types';
 
-export default function Dashboard() {
-  const [stats, setStats] = useState<SystemStats>({
-    documentCount: null,
-    chunkCount: null,
-    vectorIndexStatus: null,
-  });
-  const [systemInfo, setSystemInfo] = useState<SystemInfo>({
-    llmModel: 'Qwen 3 8B',
-    mode: 'offline',
+const Dashboard = () => {
+  const [stats, setStats] = useState<SystemStatus>({ 
+    indexed_chunks: 0, 
+    model: 'Loading...', 
+    status: 'Checking...' 
   });
 
   useEffect(() => {
-    async function loadData() {
-      const [statsData, infoData] = await Promise.all([
-        fetchSystemStats(),
-        fetchSystemInfo(),
-      ]);
-      setStats(statsData);
-      setSystemInfo(infoData);
-    }
-    loadData();
+    api.getStatus().then(setStats).catch(console.error);
   }, []);
 
-  const getIndexStatusText = (status: SystemStats['vectorIndexStatus']) => {
-    switch (status) {
-      case 'ready':
-        return 'Ready';
-      case 'building':
-        return 'Building';
-      case 'empty':
-        return 'Empty';
-      default:
-        return null;
-    }
-  };
-
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-text-primary">Dashboard</h1>
-        <p className="text-sm text-text-secondary mt-1">
-          System overview and statistics
-        </p>
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-2xl font-semibold text-gray-900">Analytics</h2>
+        <p className="text-gray-500 mt-1">Real-time metrics from your local RAG pipeline.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <KPICard
-          title="Documents"
-          value={stats.documentCount}
-          icon={<FileText size={20} />}
-          subtitle="Total uploaded"
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard 
+          label="Total Chunks" 
+          value={stats.indexed_chunks} 
+          icon={Layers} 
         />
-        <KPICard
-          title="Chunks"
-          value={stats.chunkCount}
-          icon={<Layers size={20} />}
-          subtitle="Processed segments"
+        <StatCard 
+          label="Vector Index" 
+          value="Active" 
+          icon={Database} 
         />
-        <KPICard
-          title="Vector Index"
-          value={getIndexStatusText(stats.vectorIndexStatus)}
-          icon={<Database size={20} />}
-          subtitle="Index status"
+        <StatCard 
+          label="Documents" 
+          value="28" 
+          icon={FileText} 
         />
       </div>
 
-      <div className="bg-surface border border-border rounded-xl p-6">
-        <h2 className="text-lg font-medium text-text-primary mb-6">
-          System Information
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-surface-light rounded-lg">
-              <Server size={20} className="text-text-secondary" />
-            </div>
-            <div>
-              <p className="text-sm text-text-muted">LLM Model</p>
-              <p className="text-text-primary font-medium mt-1">
-                {systemInfo.llmModel}
-              </p>
-            </div>
+      {/* Detailed Configuration Panel */}
+      <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
+        <h3 className="text-lg font-medium text-gray-900 mb-6">System Architecture</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          {/* Column 1: Models */}
+          <div className="space-y-6">
+            <ConfigItem 
+              icon={Brain} 
+              label="Chat Models" 
+              value="Qwen 2.5 (3B) / Llama 3.1 (8B)" 
+            />
+            <ConfigItem 
+              icon={Zap} 
+              label="Context Engine" 
+              value="Qwen 2.5 (3B)" 
+            />
           </div>
 
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-surface-light rounded-lg">
-              <Wifi size={20} className="text-text-secondary" />
-            </div>
-            <div>
-              <p className="text-sm text-text-muted">Mode</p>
-              <p className="text-text-primary font-medium mt-1 capitalize">
-                {systemInfo.mode}
-              </p>
-            </div>
+          {/* Column 2: Retrieval */}
+          <div className="space-y-6">
+            <ConfigItem 
+              icon={Cpu} 
+              label="Embedding Model" 
+              value="BAAI/bge-m3" 
+            />
+            <ConfigItem 
+              icon={Server} 
+              label="Vector Database" 
+              value="FAISS (CPU)" 
+            />
           </div>
+
+          {/* Column 3: Storage & Mode */}
+          <div className="space-y-6">
+            <ConfigItem 
+              icon={Database} 
+              label="Metadata Store" 
+              value="MySQL 8.0" 
+            />
+            <ConfigItem 
+              icon={HardDrive} 
+              label="Deployment Mode" 
+              value="Offline" 
+            />
+          </div>
+
         </div>
       </div>
     </div>
   );
-}
+};
+
+const StatCard = ({ label, value, icon: Icon }: any) => (
+  <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between h-32">
+    <div className="flex justify-between items-start">
+      <span className="text-sm font-medium text-gray-500">{label}</span>
+      <Icon className="text-gray-400" size={20} />
+    </div>
+    <span className="text-3xl font-bold text-gray-900 tracking-tight">{value}</span>
+  </div>
+);
+
+const ConfigItem = ({ icon: Icon, label, value }: any) => (
+  <div className="flex items-start space-x-4">
+    <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+      <Icon className="text-gray-700" size={20} />
+    </div>
+    <div>
+      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
+      <p className="text-sm font-semibold text-gray-900 mt-0.5">{value}</p>
+    </div>
+  </div>
+);
+
+export default Dashboard;

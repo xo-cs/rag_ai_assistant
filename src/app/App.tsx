@@ -1,15 +1,32 @@
-import { Routes, Route } from 'react-router-dom';
-import { MainLayout } from '../layout';
-import { Dashboard, Documents, QA } from '../pages';
+import React, { useState } from 'react';
+import MainLayout from '../layout/MainLayout';
+import Dashboard from '../pages/Dashboard';
+import Documents from '../pages/Documents';
+import QA from '../pages/QA';
 
-export default function App() {
+function App() {
+  const [activeTab, setActiveTab] = useState('dashboard');
+
   return (
-    <Routes>
-      <Route path="/" element={<MainLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="documents" element={<Documents />} />
-        <Route path="qa" element={<QA />} />
-      </Route>
-    </Routes>
+    <MainLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+      {/* 
+        We use CSS 'hidden' instead of conditional rendering (&&).
+        This keeps the QA component alive (and the LLM generating) 
+        even when you switch tabs.
+      */}
+      <div className={activeTab === 'dashboard' ? 'block' : 'hidden'}>
+        <Dashboard />
+      </div>
+      
+      <div className={activeTab === 'documents' ? 'block' : 'hidden'}>
+        <Documents />
+      </div>
+      
+      <div className={activeTab === 'qa' ? 'block' : 'hidden'}>
+        <QA />
+      </div>
+    </MainLayout>
   );
 }
+
+export default App;

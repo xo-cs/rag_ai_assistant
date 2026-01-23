@@ -13,11 +13,16 @@ def build_rag_prompt(query: str, retrieved_chunks: list) -> str:
             context += f"Section: {chunk['page_or_section']}\n"
         context += f"Content:\n{chunk['chunk_text']}\n"
 
+    # CHANGED: Added strict language instruction
     prompt = f"""You are a helpful AI assistant specializing in power grid and energy systems.
 
-Use ONLY the information provided in the context below to answer the question. If the context doesn't contain relevant information, say "I don't have enough information in the provided documents to answer this question."
+Use ONLY the information provided in the context below to answer the question. 
+If the context doesn't contain relevant information, say "I don't have enough information in the provided documents to answer this question."
 
-Be precise, technical, and cite which document you're referencing when possible.
+IMPORTANT INSTRUCTIONS:
+1. Be precise and technical.
+2. Cite which document you're referencing (e.g., "According to Document 1...").
+3. **LANGUAGE:** Answer in the SAME language as the user's question. If the question is in Korean, you MUST answer in Korean.
 
 CONTEXT:
 {context}

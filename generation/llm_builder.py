@@ -4,22 +4,27 @@ import requests
 import json
 
 class LLMBuilder:
-    def __init__(self, model_name="llama3.1:8b", base_url="http://localhost:11434"):
+    def __init__(self, model_name="qwen2.5:3b", base_url="http://localhost:11434"):
         self.model_name = model_name
         self.base_url = base_url
         self.api_endpoint = f"{base_url}/api/generate"
     
-    def generate(self, prompt: str, max_tokens=500) -> str:
+    def generate(self, prompt: str, model_name: str = None, max_tokens=500) -> str:
         """
-        Generate answer using Ollama's local Llama model
+        Generate answer using Ollama
         """
+        target_model = model_name if model_name else self.model_name
+
         payload = {
-            "model": self.model_name,
+            "model": target_model,
             "prompt": prompt,
             "stream": False,
+            "keep_alive": "60m", 
             "options": {
                 "num_predict": max_tokens,
-                "temperature": 0.7
+                "temperature": 0.7,
+                # OPTIMIZATION: Reduced context window to 2048 to prevent RAM swapping
+                "num_ctx": 2048 
             }
         }
         
@@ -27,7 +32,7 @@ class LLMBuilder:
             response = requests.post(
                 self.api_endpoint,
                 json=payload,
-                timeout=300  # Increased timeout for 8B model
+                timeout=120
             )
             response.raise_for_status()
             

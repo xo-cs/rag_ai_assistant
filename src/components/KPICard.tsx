@@ -1,29 +1,38 @@
-import { ReactNode } from 'react';
+import React from 'react';
+import { LucideIcon } from 'lucide-react';
 
 interface KPICardProps {
   title: string;
-  value: string | number | null;
-  icon: ReactNode;
-  subtitle?: string;
+  value: string | number;
+  subtext: string;
+  icon: LucideIcon;
+  color: 'blue' | 'purple' | 'green';
 }
 
-export default function KPICard({ title, value, icon, subtitle }: KPICardProps) {
+const KPICard: React.FC<KPICardProps> = ({ title, value, subtext, icon: Icon, color }) => {
+  const colorClasses = {
+    blue: 'text-blue-400 bg-blue-500',
+    purple: 'text-purple-400 bg-purple-500',
+    green: 'text-green-400 bg-green-500',
+  };
+
   return (
-    <div className="bg-surface border border-border rounded-xl p-6">
-      <div className="flex items-start justify-between">
+    <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
+      <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm text-text-secondary font-medium">{title}</p>
-          <p className="text-3xl font-semibold text-text-primary mt-2">
-            {value !== null ? value : '—'}
-          </p>
-          {subtitle && (
-            <p className="text-xs text-text-muted mt-1">{subtitle}</p>
-          )}
+          <p className="text-gray-400 text-sm">{title}</p>
+          <h3 className="text-3xl font-bold mt-2">{value}</h3>
         </div>
-        <div className="p-3 bg-surface-light rounded-lg text-text-secondary">
-          {icon}
+        <div className="p-2 bg-gray-700 rounded-lg">
+          <Icon className={colorClasses[color].split(' ')[0]} size={24} />
         </div>
       </div>
+      <div className="mt-4 h-1 bg-gray-700 rounded-full overflow-hidden">
+        <div className={`h-full w-3/4 ${colorClasses[color].split(' ')[1]}`}></div>
+      </div>
+      <p className="text-xs text-gray-500 mt-2">{subtext}</p>
     </div>
   );
-}
+};
+
+export default KPICard;

@@ -1,44 +1,30 @@
-export interface Document {
-  id: string;
-  filename: string;
-  status: 'pending' | 'processing' | 'indexed' | 'error';
-  size: number;
-  uploadedAt: string;
+export interface Source {
+  document: string;
+  page_or_section: string;
+  chunk_id?: string;
 }
 
-export interface SystemStats {
-  documentCount: number | null;
-  chunkCount: number | null;
-  vectorIndexStatus: 'ready' | 'building' | 'empty' | null;
-}
-
-export interface SystemInfo {
-  llmModel: string;
-  mode: 'offline' | 'online';
-}
-
-export interface ChatMessage {
-  id: string;
+export interface Message {
   role: 'user' | 'assistant';
   content: string;
-  timestamp: string;
-  sources?: DocumentSource[];
+  sources?: Source[];
+  generation_time?: number;
 }
 
-export interface DocumentSource {
-  documentId: string;
-  filename: string;
-  chunk: string;
-  relevance: number;
+export interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+  date: string;
 }
 
-export interface UploadResult {
-  success: boolean;
-  documentId?: string;
-  error?: string;
+export interface SystemStatus {
+  status: string;
+  indexed_chunks: number;
+  model: string;
 }
 
-export interface QueryResponse {
-  answer: string;
-  sources: DocumentSource[];
+export interface UploadResponse {
+  message: string;
+  files: string[];
 }

@@ -8,8 +8,6 @@ class QueryEmbedder:
         self.embedder = EmbeddingService(model_name)
 
     def embed(self, query: str) -> np.ndarray:
-        """
-        Convert user query into vector.
-        """
+        """Embed query (expansion handled by query_processor)"""
         vec = self.embedder.embed_query(query)
         return np.array([vec]).astype("float32")

@@ -4,14 +4,10 @@ from pathlib import Path
 import uuid
 from indexing.document_loader import load_documents, DATA_DIR
 
-
-def chunk_text(
-    text: str,
-    chunk_size: int = 600,
-    overlap: int = 200
-):
+def chunk_text(text: str, chunk_size: int = 600, overlap: int = 200):
     """
     Splits text into overlapping chunks.
+    Overlap is CRITICAL for context preservation at boundaries.
     """
     chunks = []
     start = 0
@@ -20,45 +16,32 @@ def chunk_text(
     while start < text_length:
         end = start + chunk_size
         chunk = text[start:end]
-        chunks.append(chunk.strip())
+        
+        # Only add if chunk has meaningful content
+        if len(chunk.strip()) > 50:
+            chunks.append(chunk.strip())
+        
         start = end - overlap
-
-        if start < 0:
-            start = 0
+        if start < 0: start = 0
+        
+        # Break loop if we are at the end
+        if end >= text_length:
+            break
 
     return chunks
 
-
 def chunk_documents(documents, min_chunk_length: int = 100):
-    """
-    Returns chunks formatted for database insertion with EXACT page numbers.
-    """
     all_chunks = []
 
     for doc in documents:
         chunks = chunk_text(doc["text"])
         doc_name = doc.get("document_name", Path(doc["source"]).name)
-        
-        # --- FIX IS HERE ---
-        # We use "page_num" because that is what document_loader.py saves.
-        page_num = doc.get("page_num")  
+        page_num = doc.get("page_num") 
         
         for i, chunk in enumerate(chunks):
-            chunk = chunk.strip()
-            if len(chunk) < min_chunk_length:
-                continue
-
-            # Create unique chunk ID
-            # If page_num is None, it will show 'pageNone', otherwise 'page1', 'page2' etc.
-            chunk_id = f"{doc_name}_page{page_num}_chunk{i}_{uuid.uuid4().hex[:6]}"
+            chunk_id = f"{doc_name}_p{page_num}_{i}_{uuid.uuid4().hex[:6]}"
+            page_section = f"Page {page_num}" if page_num else "N/A"
             
-            # Use exact page number for the metadata section
-            if page_num:
-                page_section = f"Page {page_num}"
-            else:
-                page_section = "N/A"
-            
-            # Format for database
             chunk_data = {
                 "chunk_id": chunk_id,
                 "vector_id": -1,
@@ -66,40 +49,6 @@ def chunk_documents(documents, min_chunk_length: int = 100):
                 "page_or_section": page_section,
                 "chunk_text": chunk
             }
-            
             all_chunks.append(chunk_data)
 
     return all_chunks
-
-
-def prepare_for_database(chunks):
-    """
-    Convert chunks to database-ready format.
-    """
-    db_records = []
-    for chunk in chunks:
-        record = (
-            chunk["chunk_id"],
-            chunk["vector_id"],
-            chunk["document_name"],
-            chunk.get("page_or_section"),
-            chunk["chunk_text"]
-        )
-        db_records.append(record)
-    return db_records
-
-
-if __name__ == "__main__":
-    # Test run
-    docs = load_documents(DATA_DIR)
-    chunks = chunk_documents(docs)
-
-    print(f"Total document pages: {len(docs)}")
-    print(f"Total chunks: {len(chunks)}")
-
-    if chunks:
-        print("\n📋 Sample chunk:")
-        print(f"chunk_id: {chunks[0]['chunk_id']}")
-        print(f"document_name: {chunks[0]['document_name']}")
-        print(f"page_or_section: {chunks[0]['page_or_section']}")
-        print(f"text preview: {chunks[0]['chunk_text'][:200]}...")

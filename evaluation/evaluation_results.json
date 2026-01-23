@@ -320,9 +320,9 @@
     {
       "query": "How do grid-forming inverters contribute to power system stability in renewable-dominant grids?",
       "relevant_docs": [
-        "pdf5.pdf",
         "pdf14.pdf",
-        "pdf6.pdf"
+        "pdf6.pdf",
+        "pdf5.pdf"
       ],
       "retrieved_docs": [
         "pdf22.pdf",
@@ -532,8 +532,8 @@
     {
       "query": "What are the voltage levels and total lengths of transmission and distribution lines in Korea's current power grid?",
       "relevant_docs": [
-        "pdf2.pdf",
-        "pdf1.pdf"
+        "pdf1.pdf",
+        "pdf2.pdf"
       ],
       "retrieved_docs": [
         "pdf24.pdf",
@@ -553,8 +553,8 @@
     {
       "query": "What is the purpose and key characteristics of HVDC transmission systems?",
       "relevant_docs": [
-        "pdf2.pdf",
-        "pdf7.pdf"
+        "pdf7.pdf",
+        "pdf2.pdf"
       ],
       "retrieved_docs": [
         "pdf24.pdf"
@@ -572,8 +572,8 @@
     {
       "query": "한국에서 재생에너지 통합을 방해하는 주요 병목 현상은 무엇인가?",
       "relevant_docs": [
-        "pdf12.pdf",
-        "pdf14.pdf"
+        "pdf14.pdf",
+        "pdf12.pdf"
       ],
       "retrieved_docs": [
         "pdf12.pdf"
@@ -612,8 +612,8 @@
     {
       "query": "배전 시스템에서 DC 배전의 장점과 적용 사례는 무엇인가?",
       "relevant_docs": [
-        "pdf3.pdf",
-        "pdf4.pdf"
+        "pdf4.pdf",
+        "pdf3.pdf"
       ],
       "retrieved_docs": [
         "pdf24.pdf"
@@ -631,8 +631,8 @@
     {
       "query": "What are the technical challenges of integrating high shares of variable renewable energy into the grid, particularly regarding voltage and frequency stability?",
       "relevant_docs": [
-        "pdf12.pdf",
         "pdf14.pdf",
+        "pdf12.pdf",
         "pdf10.pdf"
       ],
       "retrieved_docs": [
@@ -738,8 +738,8 @@
     {
       "query": "What are the key characteristics and challenges of Korea's power grid that the KPG 193 test system aims to model?",
       "relevant_docs": [
-        "pdf26.pdf",
-        "pdf27.pdf"
+        "pdf27.pdf",
+        "pdf26.pdf"
       ],
       "retrieved_docs": [
         "pdf27.pdf"
@@ -854,7 +854,8 @@
       "retrieved_docs": [
         "pdf9.pdf",
         "pdf24.pdf",
-        "pdf28.pdf"
+        "pdf28.pdf",
+        "pdf10.pdf"
       ],
       "hit": false,
       "metrics": {
